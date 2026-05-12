@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REXZ_SYSTEM | KEY SYSTEM</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Share+Tech+Mono&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #000; color: #fff; font-family: 'Orbitron', sans-serif;
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; overflow: hidden;
+        }
+
+        /* Animasi Background Partikel */
+        .bg-animate {
+            position: absolute; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #050515 0%, #000 100%);
+            z-index: -2;
+        }
+        .particles {
+            position: absolute; width: 100%; height: 100%;
+            background-image: radial-gradient(#ff0000 0.5px, transparent 0.5px), radial-gradient(#0000ff 0.5px, transparent 0.5px);
+            background-size: 50px 50px; background-position: 0 0, 25px 25px;
+            opacity: 0.2; animation: moveBg 10s linear infinite; z-index: -1;
+        }
+        @keyframes moveBg { 0% { transform: translateY(0); } 100% { transform: translateY(-50px); } }
+
+        .container {
+            width: 480px; padding: 40px; background: rgba(0, 0, 0, 0.9);
+            border: 2px solid; border-image: linear-gradient(45deg, #ff0000, #0000ff, #ff0000) 1;
+            box-shadow: 0 0 50px rgba(0, 0, 255, 0.3);
+            text-align: center; position: relative; backdrop-filter: blur(10px);
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        h1 { font-weight: 900; font-size: 1.8rem; margin-bottom: 20px; text-shadow: 0 0 10px #ff0000; }
+        .glitch { animation: glitch 1s linear infinite; }
+        @keyframes glitch { 
+            0% { text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; }
+            50% { text-shadow: -2px 0 #ff0000, 2px 0 #0000ff; }
+            100% { text-shadow: 2px 0 #ff0000, -2px 0 #0000ff; }
+        }
+
+        .status-bar { font-family: 'Share Tech Mono', monospace; color: #00d9ff; font-size: 0.7rem; margin-bottom: 15px; border-bottom: 1px solid #111; padding-bottom: 5px; }
+        .question { font-size: 1.1rem; margin-bottom: 25px; color: #fff; min-height: 50px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 5px; }
+        
+        input {
+            width: 100%; background: #000; border: 1px solid #ff0000;
+            padding: 15px; color: #fff; font-family: 'Share Tech Mono';
+            outline: none; text-align: center; margin-bottom: 20px; font-size: 1.2rem;
+            box-shadow: inset 0 0 10px rgba(255,0,0,0.2);
+        }
+
+        button {
+            width: 100%; padding: 15px; border: none; font-weight: bold;
+            cursor: pointer; text-transform: uppercase; font-family: 'Orbitron';
+            background: linear-gradient(90deg, #ff0000, #0000ff); color: #fff;
+            box-shadow: 0 0 15px rgba(255,0,0,0.4); transition: 0.3s;
+        }
+        button:hover { letter-spacing: 3px; filter: brightness(1.2); }
+
+        #key-result { 
+            display: none; padding: 20px; border: 2px dashed #00ff00; 
+            margin-top: 20px; cursor: pointer; color: #00ff00; 
+            background: rgba(0,255,0,0.1); animation: slideUp 0.5s forwards;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .expire-info { font-size: 0.6rem; color: #ff5555; margin-top: 10px; text-transform: uppercase; }
+        .shake { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+    </style>
+</head>
+<body>
+    <div class="bg-animate"><div class="particles"></div></div>
+    <div class="container" id="box">
+        <div class="status-bar">GOKIL:BANGET | VER: <span id="node-id">666</span></div>
+        <h1 class="glitch">REXZ_SYSTEM</h1>
+        
+        <div id="game-ui">
+            <div id="stage-text" style="color: #ff0000; font-size: 0.8rem; margin-bottom: 5px;">STAGE 1/5</div>
+            <div class="question" id="q-text">INITIALIZING...</div>
+            <input type="text" id="ans-input" placeholder="WAITING_FOR_INPUT" autocomplete="off">
+            <button onclick="verify()">SUBMIT DATA</button>
+        </div>
+
+        <div id="key-result" onclick="copy()">
+            <div style="font-size: 0.7rem; margin-bottom: 5px;">ACCESS GRANTED | KEY:</div>
+            <div id="key-val" style="font-weight: 900; letter-spacing: 2px;">REXZ-XXXX</div>
+            <div class="expire-info">Expired in 24 Hours (UTC Reset)</div>
+        </div>
+    </div>
+
+    <script>
+        let stage = 1;
+        let answer = "";
+        document.getElementById('node-id').innerText = "0x" + Math.floor(Math.random()*255).toString(16).toUpperCase();
+
+        function gen() {
+            const input = document.getElementById('ans-input');
+            input.value = "";
+            let q = "";
+            if(stage == 1) {
+                let n1 = Math.floor(Math.random()*40)+20;
+                let n2 = Math.floor(Math.random()*10)+2;
+                q = `DECRYPT MATH: (${n1} + ${n2}) * 2`;
+                answer = ((n1+n2)*2).toString();
+            } else if(stage == 2) {
+                let list = ["GHOST","MATRIX","BYPASS","LOCK"];
+                let w = list[Math.floor(Math.random()*list.length)];
+                q = `REVERSE DATA: "${w}"`;
+                answer = w.split('').reverse().join('');
+            } else if(stage == 3) {
+                let n = Math.floor(Math.random()*5)+3;
+                q = `NEXT LOGIC: ${n}, ${n+n}, ${n+n+n}, ?`;
+                answer = (n*4).toString();
+            } else if(stage == 4) {
+                let code = Math.random().toString(36).substring(7).toUpperCase();
+                q = `VERIFY HUMAN: TYPE "${code}"`;
+                answer = code;
+            } else if(stage == 5) {
+                q = `FINAL BREACH: TYPE "REXZ_HUB_REBORN"`;
+                answer = "REXZ_HUB_REBORN";
+            }
+            document.getElementById('q-text').innerText = q;
+            document.getElementById('stage-text').innerText = `STAGE ${stage}/5`;
+        }
+
+        function verify() {
+            let val = document.getElementById('ans-input').value.trim().toUpperCase();
+            if(val == answer.toUpperCase()) {
+                if(stage < 5) { stage++; gen(); }
+                else { finish(); }
+            } else {
+                document.getElementById('box').classList.add('shake');
+                setTimeout(()=> document.getElementById('box').classList.remove('shake'), 500);
+                alert("ACCESS DENIED. REBOOTING...");
+                location.reload();
+            }
+        }
+
+        function finish() {
+            document.getElementById('game-ui').style.display = "none";
+            const d = new Date();
+            // Key Generator berdasarkan Tanggal + Tahun + Bulan (UTC)
+            // Ini akan berubah otomatis setiap jam 00:00 UTC (24 Jam sekali)
+            const mathBase = (d.getUTCDate() * d.getUTCFullYear()) + d.getUTCMonth();
+            const key = "REXZ-" + mathBase.toString(16).toUpperCase();
+            document.getElementById('key-val').innerText = key;
+            document.getElementById('key-result').style.display = "block";
+        }
+
+        function copy() {
+            navigator.clipboard.writeText(document.getElementById('key-val').innerText);
+            alert("KEY COPIED TO CLIPBOARD!");
+        }
+
+        gen();
+    </script>
+</body>
+</html>
